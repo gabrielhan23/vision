@@ -2,8 +2,7 @@ import sys
 import numpy as np
 import tensorflow.keras.datasets.mnist as mnist
 # import matplotlib.pyplot as plt
-import weights
-np.random.seed(0)
+np.random.seed(10)
 
 (x_train, y_train), (x_test, y_test) = mnist.load_data()
 
@@ -14,6 +13,25 @@ x_train = x_train.reshape(len(x_train), 784)
 # activations
 
 # dot product m1 (rows) x n1 (cols) by m2 x n2 --> n1 and m2 have to be the same
+
+
+def snairsigmoid(x):
+    return 1 / (1 + np.exp(-x))
+
+
+def snairsigmoidPrime(x):
+    return sigmoid(x)*(1-sigmoid(x))
+
+
+def snairsoftmax(array):
+    vectorizedEx = np.vectorize(lambda x: np.exp(x))
+    numerator = vectorizedEx(array)
+    denominator = np.sum(numerator)
+    return numerator/denominator
+
+
+vectorizeSigmoid = np.vectorize(snairsigmoid)
+vecotrizeSigmoidPrime = np.vectorize(snairsigmoidPrime)
 
 
 def sigmoid(x, derivative=False):
@@ -28,6 +46,7 @@ def xadf(x, derivative=False):
     if derivative:
         return exps / np.sum(exps, axis=0) * (1 - exps / np.sum(exps, axis=0))
     return exps / np.sum(exps, axis=0)
+
 
 def softmax(array, derivative=False):
     # Numerically stable with large exponentials
@@ -51,27 +70,11 @@ numCorrect = 0
 
 w1 = np.random.randn(LAYER_1, INPUT, )  # shape(128,784)
 b1 = np.random.randn(LAYER_1)  # shape(128)
-
 w2 = np.random.randn(LAYER_2, LAYER_1)  # shape(64, 128)
 b2 = np.random.randn(LAYER_2)  # shape(64)
-
-
 w3 = np.random.randn(OUTPUT, LAYER_2)  # shape (10, 64)
 b3 = np.random.randn(OUTPUT)  # shape (10)
 
-w1 = np.array(weights.stuff[0]).T
-b1 = weights.stuff[1]
-w2 = np.array(weights.stuff[2]).T
-b2 = weights.stuff[3]
-w3 = np.array(weights.stuff[4]).T
-b3 = weights.stuff[5]
-# print(np.array(weights.stuff[0]).shape)
-# w1 = np.array(weights.stuff[0]).T
-# b1 = weights.stuff[1]
-# w2 = np.array(weights.stuff[2]).T
-# b2 = weights.stuff[3]
-# w3 = np.array(weights.stuff[4]).T
-# b3 = weights.stuff[5]
 
 
 for index, a0 in enumerate(x_train):
@@ -79,25 +82,27 @@ for index, a0 in enumerate(x_train):
     a0 = np.divide(a0, 255)
 
     z1 = np.add(np.dot(w1, a0), b1)  # shape(128,784) ----- dotified
-    a1 = [sigmoid(x) for x in z1]  # shape(128,784)
+    a1 = vectorizeSigmoid(z1)  # shape(128,784)
     z2 = np.add(np.dot(w2, a1), b2)  # shape(128,784) ----- dotified
-    a2 = [sigmoid(x) for x in z2]  # shape(128,784)
+    a2 = vectorizeSigmoid(z2)  # shape(128,784)
 
     z3 = np.add(np.dot(w3, a2), b3)
-    prediction = softmax(z3)
-    valueOfPrediction = np.where(prediction == np.amax(prediction))[0][0]
+    gabprediction = softmax(z3)
+    prediction = snairsoftmax(z3)
+    valueOfPrediction = np.argmax(prediction)
     # print(prediction, )  # prints all 1
 
     actual = y_train[index]
     print("prediction {0} actual {1}".format(
-        valueOfPrediction, actual), end="\r")
+        valueOfPrediction, actual), end="\n")
     if actual == valueOfPrediction:
         numCorrect += 1
 
     # cost = (prediction.index(max(prediction)) - actual) ** 2
 
     # # costtracker.append(cost)
-sys.stdout.flush()
+
+print()
 print(numCorrect/60000)
 # costtracker = np.array(costtracker)
 # x = [range(0,len(costtracker))]
