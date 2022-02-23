@@ -1,11 +1,11 @@
+import sys
 import numpy as np
 import tensorflow.keras.datasets.mnist as mnist
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 import weights
 np.random.seed(0)
 
-(x_train, y_train), (x_test, y_test) = mnist.load_data(
-    '/Users/gabrielhan/Coding/vision/mnist.npz')
+(x_train, y_train), (x_test, y_test) = mnist.load_data()
 
 x_train = x_train.reshape(len(x_train), 784)
 
@@ -51,7 +51,6 @@ numCorrect = 0
 # w3 = np.random.randn(OUTPUT, LAYER_2)  # shape (10, 64)
 # b3 = np.random.randn(OUTPUT)  # shape (10)
 
-print(np.array(weights.stuff[0]).shape)
 w1 = np.array(weights.stuff[0]).T
 b1 = weights.stuff[1]
 w2 = np.array(weights.stuff[2]).T
@@ -70,17 +69,20 @@ for index, a0 in enumerate(x_train):
     a2 = [sigmoid(x) for x in z2]  # shape(128,784)
 
     z3 = np.add(np.dot(w3, a2), b3)
-    prediction = [softmax(x) for x in z3]
-    print(prediction) # prints all 1
+    prediction = softmax(z3)
+    valueOfPrediction = np.where(prediction == np.amax(prediction))[0][0]
+    # print(prediction, )  # prints all 1
 
     actual = y_train[index]
-    print("prediction {0} actual {1}".format(np.amax(prediction), actual))
-    if actual == prediction.index(max(prediction)):
+    print("prediction {0} actual {1}".format(
+        valueOfPrediction, actual), end="\r")
+    if actual == valueOfPrediction:
         numCorrect += 1
 
-    cost = (np.amax(prediction) - actual) ** 2
-    # costtracker.append(cost)
+    # cost = (prediction.index(max(prediction)) - actual) ** 2
 
+    # # costtracker.append(cost)
+sys.stdout.flush()
 print(numCorrect/60000)
 # costtracker = np.array(costtracker)
 # x = [range(0,len(costtracker))]
