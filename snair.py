@@ -73,7 +73,8 @@ for index, value in enumerate(x_train):
 
     actual = np.zeros(10)
     actual[answer-1] = 1
-    # back prop
+
+    # back prop doesn't work
     outputLayerBiasesDerivative = costDerivativeWithRespectToBiases(
         outputZ, outputLayer, actual)
 
