@@ -1,9 +1,6 @@
-dn(LAYER_1, INPUT, )  # shape(128,784)
-b1 = np.random.randn(LAYER_1)  # shape(128)
-
-w2 = np.random.randn(LAYER_2, LAYER_1)  # shape(64, 128)
-b2 = np.random.randn(LAYER_2)  # shape(64)
-
-
-w3 = np.random.randn(OUTPUT, LAYER_2)  # shape (10, 64)
-b3 = np.random.ran
+eights.stuff[0]).T
+# b1 = weights.stuff[1]
+# w2 = np.array(weights.stuff[2]).T
+# b2 = weights.stuff[3]
+# w3 = np.array(weights.stuff[4]).T
+# b3 = weights.stu
