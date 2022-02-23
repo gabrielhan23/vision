@@ -49,7 +49,7 @@ numCorrect = 0
 
 
 # w3 = np.random.randn(OUTPUT, LAYER_2)  # shape (10, 64)
-# b2 = np.random.randn(OUTPUT)  # shape (10)
+# b3 = np.random.randn(OUTPUT)  # shape (10)
 
 print(np.array(weights.stuff[0]).shape)
 w1 = np.array(weights.stuff[0]).T
@@ -64,20 +64,21 @@ for index, a0 in enumerate(x_train):
     # a0 = a0.reshape(784)
     a0 = np.divide(a0, 255)
 
-    z1 = np.dot(w1, a0)  # shape(128,784) ----- dotified
+    z1 = np.add(np.dot(w1, a0), b1)  # shape(128,784) ----- dotified
     a1 = [sigmoid(x) for x in z1]  # shape(128,784)
-    z2 = np.dot(w2, a1)  # shape(128,784) ----- dotified
+    z2 = np.add(np.dot(w2, a1), b2)  # shape(128,784) ----- dotified
     a2 = [sigmoid(x) for x in z2]  # shape(128,784)
 
-    z3 = np.dot(w3, a2)
+    z3 = np.add(np.dot(w3, a2), b3)
     prediction = [softmax(x) for x in z3]
+    print(prediction) # prints all 1
 
     actual = y_train[index]
-    print("prediction {0} actual {1}".format(prediction.index(max(prediction), actual)))
+    print("prediction {0} actual {1}".format(np.amax(prediction), actual))
     if actual == prediction.index(max(prediction)):
         numCorrect += 1
 
-    cost=(np.amax(prediction) - actual) ** 2
+    cost = (np.amax(prediction) - actual) ** 2
     # costtracker.append(cost)
 
 print(numCorrect/60000)
