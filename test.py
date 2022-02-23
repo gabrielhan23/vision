@@ -2,11 +2,11 @@ import numpy as np
 import testCases
 import math
 from tensorflow.keras.datasets import mnist
+import matplotlib.pyplot as plot 
 
 
 x, y = mnist.load_data('/Users/gabrielhan/Coding/vision/mnist.npz')
 
-print(len(x),len(y))
 
 
 def sigmoid(x):
@@ -23,7 +23,6 @@ CHANGE = 0.1
 w1 = np.random.randn(LAYER_1,len(x[0][0])*len(x[0][0][0])) # previous layer nodes by current layer
 w2 = np.random.randn(LAYER_2,LAYER_1)
 w3 = np.random.randn(LAYER_3,LAYER_2)
-print(w3)
 
 b1 = np.random.randn(LAYER_1) # previous layer nodes by current layer
 b2 = np.random.randn(LAYER_2)
@@ -39,8 +38,12 @@ tb2 = np.zeros(LAYER_2)
 tb3 = np.zeros(LAYER_3) 
 
 for it, input in enumerate(x[0]):
+    plot.imshow(input, cmap='gray')
+    plot.show()
     answer = x[1][it]
     # forward prop
+    print(answer)
+
     a0 = input.reshape(len(input)*len(input[0]))
 
     
@@ -87,12 +90,14 @@ for it, input in enumerate(x[0]):
     else: 
         batch += 1
 
+    break
+
     # if answer == a3.index(max(a3))+1: correct+=1
     # print(correct/(it+1)*100," percent correct         \r",)
     
 
 
-
+'''
 for it, input in enumerate(y[0]):
     answer = y[1][it]
     # forward prop
@@ -115,7 +120,7 @@ print(w3)
 print(correct/(it+1)*100," percent correct")
 # weights = np.random.randn(9,3)
 # weights_2 = np.random.randn(3,2)
-
+'''
 # for test in testCases.inputs:
 #     print("Test Case: ")
 #     input_flatten = np.array(test["testCase"]).reshape(9)

@@ -6,9 +6,8 @@ from sklearn.model_selection import train_test_split
 import time
 from tensorflow.keras.datasets import mnist
 
-x, y = mnist.load_data('/Users/gabrielhan/Coding/vision/mnist.npz')
 
-x_train, x_val, y_train, y_val = train_test_split(x, y, test_size=0.15, random_state=42)
+(x_train, x_val), (y_train, y_val) = mnist.load_data('/Users/gabrielhan/Coding/vision/mnist.npz')
 
 
 print("god damn")
