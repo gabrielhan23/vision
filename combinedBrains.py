@@ -29,9 +29,10 @@ def xadf(x, derivative=False):
         return exps / np.sum(exps, axis=0) * (1 - exps / np.sum(exps, axis=0))
     return exps / np.sum(exps, axis=0)
 
-def softmax(x, d, derivative=False):
+def softmax(array, derivative=False):
     # Numerically stable with large exponentials
-    n = np.e**(x)
+    n = np.e**(array)
+    d = sum(n)
     if derivative:
         return n
     return n / d
@@ -77,7 +78,8 @@ for index, a0 in enumerate(x_train):
     a2 = [sigmoid(x) for x in z2]  # shape(128,784)
 
     z3 = np.add(np.dot(w3, a2), b3)
-    prediction = [softmax(x) for x in z3]
+    softsum = sum(np.e**z3)
+    prediction = [softmax(x,softsum) for x in z3]
     print(prediction) # prints all 1
 
     actual = y_train[index]
