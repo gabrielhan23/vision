@@ -4,7 +4,6 @@ import tensorflow.keras.datasets.mnist as mnist
 # import matplotlib.pyplot as plt
 np.random.seed(10)
 
-(x_train, y_train), (x_test, y_test) = mnist.load_data()
 
 x_train = x_train.reshape(len(x_train), 784)
 
@@ -39,6 +38,10 @@ def sigmoid(x, derivative=False):
         return (np.exp(-x))/((np.exp(-x)+1)**2)
     return 1/(1 + np.exp(-x))
 
+def sigmoid(array, derivative=False):
+    if derivative:
+        return [(np.exp(-x))/((np.exp(-x)+1)**2) for x in array]
+    return [1/(1 + np.exp(-x)) for x in array]
 
 def xadf(x, derivative=False):
     # Numerically stable with large exponentials
@@ -74,7 +77,6 @@ w2 = np.random.randn(LAYER_2, LAYER_1)  # shape(64, 128)
 b2 = np.random.randn(LAYER_2)  # shape(64)
 w3 = np.random.randn(OUTPUT, LAYER_2)  # shape (10, 64)
 b3 = np.random.randn(OUTPUT)  # shape (10)
-
 
 
 for index, a0 in enumerate(x_train):
