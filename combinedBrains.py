@@ -22,12 +22,19 @@ def sigmoid(x, derivative=False):
     return 1/(1 + np.exp(-x))
 
 
-def softmax(x, derivative=False):
+def xadf(x, derivative=False):
     # Numerically stable with large exponentials
     exps = np.exp(x - x.max())
     if derivative:
         return exps / np.sum(exps, axis=0) * (1 - exps / np.sum(exps, axis=0))
     return exps / np.sum(exps, axis=0)
+
+def softmax(x, d, derivative=False):
+    # Numerically stable with large exponentials
+    n = np.e**(x)
+    if derivative:
+        return n
+    return n / d
 
 
 INPUT = 784
@@ -41,23 +48,23 @@ numCorrect = 0
 
 # a0 = x_train.reshape()  # input shape(784,)
 
-# w1 = np.random.randn(LAYER_1, INPUT, )  # shape(128,784)
-# b1 = np.random.randn(LAYER_1)  # shape(128)
+w1 = np.random.randn(LAYER_1, INPUT, )  # shape(128,784)
+b1 = np.random.randn(LAYER_1)  # shape(128)
 
-# w2 = np.random.randn(LAYER_2, LAYER_1)  # shape(64, 128)
-# b2 = np.random.randn(LAYER_2)  # shape(64)
+w2 = np.random.randn(LAYER_2, LAYER_1)  # shape(64, 128)
+b2 = np.random.randn(LAYER_2)  # shape(64)
 
 
-# w3 = np.random.randn(OUTPUT, LAYER_2)  # shape (10, 64)
-# b3 = np.random.randn(OUTPUT)  # shape (10)
+w3 = np.random.randn(OUTPUT, LAYER_2)  # shape (10, 64)
+b3 = np.random.randn(OUTPUT)  # shape (10)
 
-print(np.array(weights.stuff[0]).shape)
-w1 = np.array(weights.stuff[0]).T
-b1 = weights.stuff[1]
-w2 = np.array(weights.stuff[2]).T
-b2 = weights.stuff[3]
-w3 = np.array(weights.stuff[4]).T
-b3 = weights.stuff[5]
+# print(np.array(weights.stuff[0]).shape)
+# w1 = np.array(weights.stuff[0]).T
+# b1 = weights.stuff[1]
+# w2 = np.array(weights.stuff[2]).T
+# b2 = weights.stuff[3]
+# w3 = np.array(weights.stuff[4]).T
+# b3 = weights.stuff[5]
 
 
 for index, a0 in enumerate(x_train):
@@ -74,7 +81,7 @@ for index, a0 in enumerate(x_train):
     print(prediction) # prints all 1
 
     actual = y_train[index]
-    print("prediction {0} actual {1}".format(np.amax(prediction), actual))
+    print("prediction {0} actual {1}".format(prediction.index(np.amax(prediction)), actual))
     if actual == prediction.index(max(prediction)):
         numCorrect += 1
 
