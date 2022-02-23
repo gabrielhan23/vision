@@ -1,1 +1,1 @@
-y_train, y_val
+mCorrect/60000)

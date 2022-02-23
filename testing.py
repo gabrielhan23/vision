@@ -10,4 +10,4 @@ a = np.array([
 b = np.array([4,5,6])
 
 print(a.shape,b.shape)
-print(sum((a*b).T))
+print(np.dot(a,b))

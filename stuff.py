@@ -6,7 +6,7 @@ from sklearn.model_selection import train_test_split
 import time
 from tensorflow.keras.datasets import mnist
 
-
+#hi there
 (x_train, x_val), (y_train, y_val) = mnist.load_data('/Users/gabrielhan/Coding/vision/mnist.npz')
 
 
@@ -131,6 +131,7 @@ class DeepNeuralNetwork():
         start_time = time.time()
         for iteration in range(self.epochs):
             for x,y in zip(x_train, y_train):
+                x = x.reshape(784)
                 output = self.forward_pass(x)
                 changes_to_w = self.backward_pass(y, output)
                 self.update_network_parameters(changes_to_w)

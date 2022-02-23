@@ -2,7 +2,9 @@
 import numpy as np
 import tensorflow.keras.datasets.mnist as mnist
 
-(x_train, y_train), (x_test, y_test) = mnist.load_data(path='mnist.npz')
+# (x_train, y_train), (x_test, y_test) = mnist.load_data(path='mnist.npz')
+(x_train, y_train), (x_test, y_test) = mnist.load_data(
+    '/Users/gabrielhan/Coding/vision/mnist.npz')
 
 
 def sigmoid(x):
