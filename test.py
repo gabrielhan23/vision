@@ -1,3 +1,4 @@
+from re import A
 import numpy as np
 import testCases
 import math
@@ -14,6 +15,19 @@ def sigmoid(x):
 
 def sigmoid_prime(x):
     return sigmoid(x)*(1-sigmoid(x))
+
+def softmax(x, d, derivative=False):
+    # Numerically stable with large exponentials
+    n = np.e**(x)
+    if derivative:
+        return n
+    return n / d
+
+def relu(x, derivative=False):
+    if derivative:
+        if x < 0: return 0
+        return 1
+    return max(0,x)
 
 LAYER_1 = 128
 LAYER_2 = 64
@@ -38,41 +52,48 @@ tb2 = np.zeros(LAYER_2)
 tb3 = np.zeros(LAYER_3) 
 
 for it, input in enumerate(x[0]):
-    plot.imshow(input, cmap='gray')
-    plot.show()
+    # plot.imshow(input, cmap='gray')
+    # plot.show()
     answer = x[1][it]
     # forward prop
-    print(answer)
 
     a0 = input.reshape(len(input)*len(input[0]))
+    a0 = np.divide(a0, 255.)
 
     
     z1 = np.dot(w1,a0) - b1
-    a1 = [sigmoid(x) for x in z1]
+    a1 = [relu(x) for x in z1]
+    print(a1)
 
     z2 = np.dot(w2,a1) - b2
-    a2 = [sigmoid(x) for x in z2]
+    a2 = [relu(x) for x in z2]
 
     z3 = np.dot(w3,a2) - b3
-    a3 = [sigmoid(x) for x in z3]
-    
+    as3 = sum(np.e**z3)
+    a3 = [softmax(x,as3) for x in z3]
+    print(a2)
+    print(a3)
     ye = np.zeros(LAYER_3)
-    ye[answer-1] = 1
+    ye[answer] = 1
+    print(a3)
+    print("prediction {0} actual {1}".format(np.argmax(a3), answer))
 
     # back prop
-    e3 = sigmoid_prime(z3)*2*(a3-ye) / np.array(a3).shape[0]
+    ec3 = sum(np.e**z3)
+    print("AHHHHHH  ",[softmax(x,ec3,derivative=True) for x in z3])
+    e3 = [softmax(x,ec3,derivative=True) for x in z3]*(a3-ye)*2
     dc3 = np.outer(e3,a2)
     da3 = np.dot(w3.T,e3)
     tw3 += dc3
     tb3 += e3
 
-    e2 = sigmoid_prime(z2)*2*da3
+    e2 = [relu(x,derivative=True) for x in z2]*da3*2
     dc2 = np.outer(e2,a1)
     da2 = np.dot(w2.T,e2)
     tw2 += dc2
     tb2 += e2
 
-    e1 = sigmoid_prime(z1)*2*da2
+    e1 = [relu(x,derivative=True) for x in z1]*da2*2
     dc1 = np.outer(e1,a0)
     da1 = np.dot(w1.T,e1)
     tw1 += dc1
@@ -90,14 +111,11 @@ for it, input in enumerate(x[0]):
     else: 
         batch += 1
 
-    break
-
     # if answer == a3.index(max(a3))+1: correct+=1
     # print(correct/(it+1)*100," percent correct         \r",)
     
 
 
-'''
 for it, input in enumerate(y[0]):
     answer = y[1][it]
     # forward prop
@@ -120,7 +138,7 @@ print(w3)
 print(correct/(it+1)*100," percent correct")
 # weights = np.random.randn(9,3)
 # weights_2 = np.random.randn(3,2)
-'''
+
 # for test in testCases.inputs:
 #     print("Test Case: ")
 #     input_flatten = np.array(test["testCase"]).reshape(9)
