@@ -4,6 +4,7 @@ import tensorflow.keras.datasets.mnist as mnist
 # import matplotlib.pyplot as plt
 np.random.seed(10)
 
+(x_train, y_train), (x_test, y_test) = mnist.load_data('/Users/gabrielhan/Coding/vision/mnist.npz')
 
 x_train = x_train.reshape(len(x_train), 784)
 
@@ -56,9 +57,17 @@ def softmax(array, derivative=False):
     n = np.e**(array)
     d = sum(n)
     if derivative:
-        return n
+        return n*(d-n) / d**2
     return n / d
 
+def relu(array, derivative=False):
+    if derivative:
+        s = []
+        for x in array:
+            if x < 0: s.append(0)
+            else: s.append(1)
+        return s
+    return [max(0,x) for x in array]
 
 INPUT = 784
 LAYER_1 = 128
@@ -89,22 +98,47 @@ for index, a0 in enumerate(x_train):
     a2 = vectorizeSigmoid(z2)  # shape(128,784)
 
     z3 = np.add(np.dot(w3, a2), b3)
-    gabprediction = softmax(z3)
-    prediction = snairsoftmax(z3)
+    prediction = softmax(z3)
+    # prediction = snairsoftmax(z3)
     valueOfPrediction = np.argmax(prediction)
     # print(prediction, )  # prints all 1
 
+    actualArray = np.zeros(OUTPUT)
     actual = y_train[index]
-    print("prediction {0} actual {1}".format(
-        valueOfPrediction, actual), end="\n")
-    if actual == valueOfPrediction:
-        numCorrect += 1
+    actualArray[actual] = 1
+
+    # print("prediction {0} actual {1}".format(valueOfPrediction, actual), end="\n")
+    if actual == valueOfPrediction: numCorrect += 1
 
     # cost = (prediction.index(max(prediction)) - actual) ** 2
 
     # # costtracker.append(cost)
+    # prediction - actual = shape(10)
+    # softmax z3 = shape(10)
 
-print()
+    e3 = softmax(z3, derivative=True)*(prediction-actualArray)*2 
+    dcw3 = np.outer(e3,a2)
+    dca3 = np.dot(w3.T,e3)
+    # dca3 = np.dot(e3,w3)
+    w3 -= dcw3
+    b3 -= e3
+
+    e2 = sigmoid(z2, derivative=True)*dca3
+    dcw2 = np.outer(e2,a1)
+    dca2 = np.dot(w2.T,e2)
+    # dca2 = np.dot(e2,w2)
+    w2 -= dcw2
+    b2 -= e2
+
+    e1 = sigmoid(z1, derivative=True)*dca2 
+    dcw1 = np.outer(e1,a0)
+    # dca1 = np.dot(w1.T,e1)
+    # dca1 = np.dot(e1,w1)
+    w1 -= dcw1
+    b1 -= e1
+    
+    # print(sum((prediction-actualArray)**2))
+
 print(numCorrect/60000)
 # costtracker = np.array(costtracker)
 # x = [range(0,len(costtracker))]

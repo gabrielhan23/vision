@@ -14,13 +14,14 @@ def softmax(array, derivative=False):
     return n / d
 
 a = np.array([
-    [1,2,3],
-    [1,2,3],
-    [1,2,3],
-    [1,2,3],
-    [1,2,3]
+    [1,2,3,4,5],
+    [2,2,3,4,5],
+    [1,2,3,4,5]
 ])
 b = np.array([4,5,6])
 
 print(a.shape,b.shape)
-print(softmax(b,derivative=True))
+print(np.dot(b,a))
+
+# a2, e3
+# 64   10 
