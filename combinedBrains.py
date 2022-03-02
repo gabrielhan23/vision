@@ -7,6 +7,7 @@ np.random.seed(10)
 (x_train, y_train), (x_test, y_test) = mnist.load_data('/Users/gabrielhan/Coding/vision/mnist.npz')
 
 x_train = x_train.reshape(len(x_train), 784)
+x_test = x_test.reshape(len(x_test), 784)
 
 # connections from input layer to first  layer = 100352
 
@@ -15,41 +16,10 @@ x_train = x_train.reshape(len(x_train), 784)
 # dot product m1 (rows) x n1 (cols) by m2 x n2 --> n1 and m2 have to be the same
 
 
-def snairsigmoid(x):
-    return 1 / (1 + np.exp(-x))
-
-
-def snairsigmoidPrime(x):
-    return sigmoid(x)*(1-sigmoid(x))
-
-
-def snairsoftmax(array):
-    vectorizedEx = np.vectorize(lambda x: np.exp(x))
-    numerator = vectorizedEx(array)
-    denominator = np.sum(numerator)
-    return numerator/denominator
-
-
-vectorizeSigmoid = np.vectorize(snairsigmoid)
-vecotrizeSigmoidPrime = np.vectorize(snairsigmoidPrime)
-
-
-def sigmoid(x, derivative=False):
-    if derivative:
-        return (np.exp(-x))/((np.exp(-x)+1)**2)
-    return 1/(1 + np.exp(-x))
-
 def sigmoid(array, derivative=False):
     if derivative:
         return [(np.exp(-x))/((np.exp(-x)+1)**2) for x in array]
     return [1/(1 + np.exp(-x)) for x in array]
-
-def xadf(x, derivative=False):
-    # Numerically stable with large exponentials
-    exps = np.exp(x - x.max())
-    if derivative:
-        return exps / np.sum(exps, axis=0) * (1 - exps / np.sum(exps, axis=0))
-    return exps / np.sum(exps, axis=0)
 
 
 def softmax(array, derivative=False):
@@ -74,74 +44,99 @@ LAYER_1 = 128
 LAYER_2 = 64
 OUTPUT = 10
 LEARNING_RATE = 0.01
+EPOCHES = 12
 
 # costtracker = []
 numCorrect = 0
 
 # a0 = x_train.reshape()  # input shape(784,)
 
-w1 = np.random.randn(LAYER_1, INPUT, )  # shape(128,784)
-b1 = np.random.randn(LAYER_1)  # shape(128)
-w2 = np.random.randn(LAYER_2, LAYER_1)  # shape(64, 128)
-b2 = np.random.randn(LAYER_2)  # shape(64)
-w3 = np.random.randn(OUTPUT, LAYER_2)  # shape (10, 64)
-b3 = np.random.randn(OUTPUT)  # shape (10)
+w1 = np.zeros((LAYER_1, INPUT))  # shape(128,784)
+b1 = np.zeros(LAYER_1)  # shape(128)
+w2 = np.zeros((LAYER_2, LAYER_1))  # shape(64, 128)
+b2 = np.zeros(LAYER_2)  # shape(64)
+w3 = np.zeros((OUTPUT, LAYER_2))  # shape (10, 64)
+b3 = np.zeros(OUTPUT)  # shape (10)
+
+tw1 = np.zeros((LAYER_1, INPUT))  # shape(128,784)
+tb1 = np.zeros(LAYER_1)  # shape(128)
+tw2 = np.zeros((LAYER_2, LAYER_1))  # shape(64, 128)
+tb2 = np.zeros(LAYER_2)  # shape(64)
+tw3 = np.zeros((OUTPUT, LAYER_2))  # shape (10, 64)
+tb3 = np.zeros(OUTPUT)  # shape (10)
 
 
-for index, a0 in enumerate(x_train):
-    # a0 = a0.reshape(784)
-    a0 = np.divide(a0, 255)
+for epoch in range(EPOCHES):
+    for index, a0 in enumerate(x_train):
+        # normalize
+        a0 = np.divide(a0, 255)
 
-    z1 = np.add(np.dot(w1, a0), b1)  # shape(128,784) ----- dotified
-    a1 = vectorizeSigmoid(z1)  # shape(128,784)
-    z2 = np.add(np.dot(w2, a1), b2)  # shape(128,784) ----- dotified
-    a2 = vectorizeSigmoid(z2)  # shape(128,784)
+        z1 = np.add(np.dot(w1, a0), b1)  # shape(128,784) ----- dotified
+        a1 = sigmoid(z1)  # shape(128,784)
+        z2 = np.add(np.dot(w2, a1), b2)  # shape(128,784) ----- dotified
+        a2 = sigmoid(z2)  # shape(128,784)
 
-    z3 = np.add(np.dot(w3, a2), b3)
-    prediction = softmax(z3)
-    # prediction = snairsoftmax(z3)
-    valueOfPrediction = np.argmax(prediction)
-    # print(prediction, )  # prints all 1
+        z3 = np.add(np.dot(w3, a2), b3)
+        prediction = softmax(z3)
+        # prediction = snairsoftmax(z3)
+        valueOfPrediction = np.argmax(prediction)
+        # print(prediction, )  # prints all 1
 
-    actualArray = np.zeros(OUTPUT)
-    actual = y_train[index]
-    actualArray[actual] = 1
+        actualArray = np.zeros(OUTPUT)
+        actual = y_train[index]
+        actualArray[actual] = 1
 
-    # print("prediction {0} actual {1}".format(valueOfPrediction, actual), end="\n")
-    if actual == valueOfPrediction: numCorrect += 1
+        # print("prediction {0} actual {1}".format(valueOfPrediction, actual), end="\n")
+        if actual == valueOfPrediction: numCorrect += 1
 
-    # cost = (prediction.index(max(prediction)) - actual) ** 2
+        # cost = (prediction.index(max(prediction)) - actual) ** 2
 
-    # # costtracker.append(cost)
-    # prediction - actual = shape(10)
-    # softmax z3 = shape(10)
+        # # costtracker.append(cost)
+        # prediction - actual = shape(10)
+        # softmax z3 = shape(10)
 
-    e3 = softmax(z3, derivative=True)*(prediction-actualArray)*2 
-    dcw3 = np.outer(e3,a2)
-    dca3 = np.dot(w3.T,e3)
-    # dca3 = np.dot(e3,w3)
-    w3 -= dcw3
-    b3 -= e3
+        e3 = softmax(z3, derivative=True)*(prediction-actualArray)*2 
+        dcw3 = np.outer(e3,a2)
+        dca3 = np.dot(w3.T,e3)
+        # dca3 = np.dot(e3,w3)
+        tw3 -= dcw3
+        tb3 -= e3
 
-    e2 = sigmoid(z2, derivative=True)*dca3
-    dcw2 = np.outer(e2,a1)
-    dca2 = np.dot(w2.T,e2)
-    # dca2 = np.dot(e2,w2)
-    w2 -= dcw2
-    b2 -= e2
+        e2 = sigmoid(z2, derivative=True)*dca3
+        dcw2 = np.outer(e2,a1)
+        dca2 = np.dot(w2.T,e2)
+        # dca2 = np.dot(e2,w2)
+        tw2 -= dcw2
+        tb2 -= e2
 
-    e1 = sigmoid(z1, derivative=True)*dca2 
-    dcw1 = np.outer(e1,a0)
-    # dca1 = np.dot(w1.T,e1)
-    # dca1 = np.dot(e1,w1)
-    w1 -= dcw1
-    b1 -= e1
+        e1 = sigmoid(z1, derivative=True)*dca2 
+        dcw1 = np.outer(e1,a0)
+        # dca1 = np.dot(w1.T,e1)
+        # dca1 = np.dot(e1,w1)
+        tw1 -= dcw1
+        tb1 -= e1
+        
+        # print(sum((prediction-actualArray)**2))
+
+    print(numCorrect/60000)
     
-    # print(sum((prediction-actualArray)**2))
+    w3 += tw3/60000
+    w2 += tw2/60000
+    w1 += tw1/60000
+    b3 += tb3/60000
+    b2 += tb2/60000
+    b1 += tb1/60000
 
-print(numCorrect/60000)
-# costtracker = np.array(costtracker)
-# x = [range(0,len(costtracker))]
-# y = costtracker
-# plt.plot(x, y, color="red")
-# plt.show()
+    tw1 = np.zeros((LAYER_1, INPUT))  # shape(128,784)
+    tb1 = np.zeros(LAYER_1)  # shape(128)
+    tw2 = np.zeros((LAYER_2, LAYER_1))  # shape(64, 128)
+    tb2 = np.zeros(LAYER_2)  # shape(64)
+    tw3 = np.zeros((OUTPUT, LAYER_2))  # shape (10, 64)
+    tb3 = np.zeros(OUTPUT)  # shape (10)
+
+
+    # costtracker = np.array(costtracker)
+    # x = [range(0,len(costtracker))]
+    # y = costtracker
+    # plt.plot(x, y, color="red")
+    # plt.show()

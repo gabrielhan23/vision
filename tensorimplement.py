@@ -37,7 +37,8 @@ model = tf.keras.models.Sequential([
 ])
 model.compile(
     
-    loss=tf.keras.losses.MeanSquaredError()
+    loss=tf.keras.losses.MeanSquaredError(),
+    metrics=tf.keras.metrics.CategoricalAccuracy()
 )
 
 model.fit(

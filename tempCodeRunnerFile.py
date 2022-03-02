@@ -1,1 +1,1 @@
-"Output:",output)
+LAYER_1, INPUT
