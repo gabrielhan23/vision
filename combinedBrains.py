@@ -4,7 +4,7 @@ import tensorflow.keras.datasets.mnist as mnist
 # import matplotlib.pyplot as plt
 np.random.seed(10)
 
-(x_train, y_train), (x_test, y_test) = mnist.load_data('/Users/gabrielhan/Coding/vision/mnist.npz')
+(x_train, y_train), (x_test, y_test) = mnist.load_data()
 
 x_train = x_train.reshape(len(x_train), 784)
 x_test = x_test.reshape(len(x_test), 784)
