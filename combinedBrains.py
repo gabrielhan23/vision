@@ -4,6 +4,7 @@ import tensorflow.keras.datasets.mnist as mnist
 # import matplotlib.pyplot as plt
 np.random.seed(10)
 
+(x_train, y_train), (x_test, y_test) = mnist.load_data()
 
 x_train = x_train.reshape(len(x_train), 784)
 
@@ -14,12 +15,10 @@ x_train = x_train.reshape(len(x_train), 784)
 # dot product m1 (rows) x n1 (cols) by m2 x n2 --> n1 and m2 have to be the same
 
 
-def snairsigmoid(x):
+def sigmoid(x, derivative=False):
+    if derivative:
+        return (np.exp(-x))/((np.exp(-x)+1)**2)
     return 1 / (1 + np.exp(-x))
-
-
-def snairsigmoidPrime(x):
-    return sigmoid(x)*(1-sigmoid(x))
 
 
 def snairsoftmax(array):
@@ -29,8 +28,7 @@ def snairsoftmax(array):
     return numerator/denominator
 
 
-vectorizeSigmoid = np.vectorize(snairsigmoid)
-vecotrizeSigmoidPrime = np.vectorize(snairsigmoidPrime)
+vectorizeSigmoid = np.vectorize(sigmoid)
 
 
 def sigmoid(x, derivative=False):
@@ -38,10 +36,6 @@ def sigmoid(x, derivative=False):
         return (np.exp(-x))/((np.exp(-x)+1)**2)
     return 1/(1 + np.exp(-x))
 
-def sigmoid(array, derivative=False):
-    if derivative:
-        return [(np.exp(-x))/((np.exp(-x)+1)**2) for x in array]
-    return [1/(1 + np.exp(-x)) for x in array]
 
 def xadf(x, derivative=False):
     # Numerically stable with large exponentials
