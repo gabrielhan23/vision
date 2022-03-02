@@ -7,7 +7,7 @@ import time
 from tensorflow.keras.datasets import mnist
 
 #hi there
-(x_train, x_val), (y_train, y_val) = mnist.load_data('/Users/gabrielhan/Coding/vision/mnist.npz')
+(x_train, y_train), (x_val, y_val) = mnist.load_data('/Users/gabrielhan/Coding/vision/mnist.npz')
 
 
 print("god damn")
@@ -21,17 +21,16 @@ class DeepNeuralNetwork():
         # we save all parameters in the neural network in this dictionary
         self.params = self.initialization()
 
-    def sigmoid(self, x, derivative=False):
+    def sigmoid(self, array, derivative=False):
         if derivative:
-            return (np.exp(-x))/((np.exp(-x)+1)**2)
-        return 1/(1 + np.exp(-x))
+            return (np.exp(-array))/((np.exp(-array)+1)**2)
+        return 1/(1 + np.exp(-array))
 
-    def softmax(self, x, derivative=False):
+    def softmax(self, array, derivative=False):
         # Numerically stable with large exponentials
-        exps = np.exp(x - x.max())
         if derivative:
-            return exps / np.sum(exps, axis=0) * (1 - exps / np.sum(exps, axis=0))
-        return exps / np.sum(exps, axis=0)
+            return np.e**(array)*(sum(np.e**(array))-np.e**(array)) / sum(np.e**(array))**2
+        return np.e**(array) / sum(np.e**(array))
 
     def initialization(self):
         # number of nodes in each layer
@@ -41,7 +40,7 @@ class DeepNeuralNetwork():
         output_layer=self.sizes[3]
 
         params = {
-            'W1':np.random.randn(hidden_1, input_layer) * np.sqrt(1. / hidden_1),
+            'W1':np.random.rand(hidden_1, input_layer)-0.5,
             'W2':np.random.randn(hidden_2, hidden_1) * np.sqrt(1. / hidden_2),
             'W3':np.random.randn(output_layer, hidden_2) * np.sqrt(1. / output_layer)
         }
@@ -53,18 +52,23 @@ class DeepNeuralNetwork():
 
         # input layer activations becomes sample
         params['A0'] = x_train
+        # print("FORWARD PASS A0: ",params['A0'])
 
         # input layer to hidden layer 1
         params['Z1'] = np.dot(params["W1"], params['A0'])
         params['A1'] = self.sigmoid(params['Z1'])
+        print("FORWARD PASS w1: ",params['W1'])
+        print("FORWARD PASS z1: ",params['Z1'])
 
         # hidden layer 1 to hidden layer 2
         params['Z2'] = np.dot(params["W2"], params['A1'])
         params['A2'] = self.sigmoid(params['Z2'])
+        print("FORWARD PASS A1: ",params['A1'])
 
         # hidden layer 2 to output layer
         params['Z3'] = np.dot(params["W3"], params['A2'])
         params['A3'] = self.softmax(params['Z3'])
+        # print("FORWARD PASS A3: ",params['A3'])
 
         return params['A3']
 
@@ -122,7 +126,9 @@ class DeepNeuralNetwork():
 
         for x, y in zip(x_val, y_val):
             output = self.forward_pass(x)
+            # print("Output:",output)
             pred = np.argmax(output)
+            # print("Pred: ", pred)
             predictions.append(pred == np.argmax(y))
         
         return np.mean(predictions)
@@ -133,13 +139,16 @@ class DeepNeuralNetwork():
             for x,y in zip(x_train, y_train):
                 x = x.reshape(784)
                 output = self.forward_pass(x)
+                print("OUTPUT: ",output)
+                print("Predicted: ",np.argmax(output))
                 changes_to_w = self.backward_pass(y, output)
                 self.update_network_parameters(changes_to_w)
-            
+            x_val = x_val.reshape(10000,784)
             accuracy = self.compute_accuracy(x_val, y_val)
             print('Epoch: {0}, Time Spent: {1:.2f}s, Accuracy: {2:.2f}%'.format(
                 iteration+1, time.time() - start_time, accuracy * 100
             ))
             
 dnn = DeepNeuralNetwork(sizes=[784, 128, 64, 10])
+
 dnn.train(x_train, y_train, x_val, y_val)
