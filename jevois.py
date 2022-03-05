@@ -14,9 +14,9 @@ while(True):
     # Display the resulting frame
 
     # 240°, 6%, 60%
-    h = 140/2
-    threshold = 30
-    hsv_low = np.array([h-threshold,40,40])
+    h = 120/2
+    threshold = 20
+    hsv_low = np.array([h-threshold,100,40])
     hsv_high = np.array([h+threshold,255,255])
     
        
@@ -35,7 +35,7 @@ while(True):
     avx,avy = 0,0
     for contour in contours:
         area = cv2.contourArea(contour)
-        if (area > 400):
+        if (1500 > area > 200):
             filtered_contours.append(contour)
             rect = cv2.minAreaRect(contour)
             box = cv2.boxPoints(rect)
@@ -55,7 +55,7 @@ while(True):
         # Using cv2.circle() method
         filtered_frame = cv2.circle(filtered_frame, center_coordinates, radius, color, thickness)
                 # cv2.circle(filtered_frame,(avx/len(filtered_contours),avy/len(filtered_contours)), 3, (0,255,0), -1)
-        print("RPM: ", avy*100+3000)
+        print("RPM: ", avy*25+3000)
         frame_width = vid.get(cv2.CAP_PROP_FRAME_WIDTH)
         print("WIDTH: ",frame_width)
         print("center",avx)

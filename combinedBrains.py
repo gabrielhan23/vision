@@ -133,6 +133,7 @@ for epoch in range(EPOCHES):
     tb2 = np.zeros(LAYER_2)  # shape(64)
     tw3 = np.zeros((OUTPUT, LAYER_2))  # shape (10, 64)
     tb3 = np.zeros(OUTPUT)  # shape (10)
+    numCorrect = 0
 
 
     # costtracker = np.array(costtracker)
